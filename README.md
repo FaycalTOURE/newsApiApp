@@ -19,3 +19,4 @@ NEWS_API_KEY=2fdd5376bdfe4c56929d6f07c5a2e4ac`
 
 - Installer les dépendances avec la commande `npm i`
 - Lancer le serveur avec la commande `npm start`
+- npm run build pour re-build les assets et créer le dossier /dist (si besoin uniquement)
