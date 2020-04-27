@@ -1,0 +1,123 @@
+.pos-card {
+  cursor: pointer;
+  user-select: none;
+  @include media-breakpoint-down(md) {
+    width: 100%;
+    min-width: 100%;
+    flex-direction: column;
+  }
+  min-width: 450px;
+  min-height: 250px;
+  background-color: $white;
+  background:  $white;
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+
+  .additional {
+    @include media-breakpoint-down(md) {
+      position: relative;
+      width: 100%;
+    }
+    position: absolute;
+    width: 150px;
+    height: 100%;
+    transition: width 0.3s;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  &:hover .additional {
+    width: 100%;
+    border-radius: 0 5px 5px 0;
+  }
+
+  .additional {
+    .user-card {
+      width: 150px;
+      height: 100%;
+    }
+
+    @include media-breakpoint-down(md) {
+      .more-info {
+        display: none;
+      }
+    }
+    .more-info {
+      width: 300px;
+      top: 0;
+      left: 150px;
+      height: 100%;
+      color: darken($success, 30%);
+    }
+  }
+
+  .additional {
+    .coords span + span {
+      float: right;
+    }
+
+    .stats {
+      font-size: 2rem;
+      display: flex;
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      top: auto;
+    }
+  }
+
+  .additional .stats {
+    > div {
+      flex: 1;
+      text-align: center;
+    }
+
+    i {
+      display: block;
+    }
+
+    div {
+      &.title {
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      &.value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+
+        &.infinity {
+          font-size: 2.5rem;
+        }
+      }
+    }
+  }
+
+  .general {
+    width: 300px;
+    height: 100%;
+    @include media-breakpoint-down(md) {
+      position: relative;
+      width: 100%;
+    }
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    box-sizing: border-box;
+    padding: 1rem;
+    padding-top: 0;
+
+    .more {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      font-size: 0.9em;
+    }
+  }
+}

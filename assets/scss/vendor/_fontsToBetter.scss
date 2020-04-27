@@ -1,0 +1,34 @@
+// The SCSS is enabled as the CSS preprocessor
+
+// Set line-height and margins for all elements
+*:not(header a, header li, header input, header span, header, header div, section h1, section h2, section h3, section h4, section h5, section h6) {
+  @include line-height(1);
+  @include margin-bottom(1);
+  @include margin-top(0);
+}
+
+$headings: (
+        h1: (1.5, 2.25, 1, 1),
+        h2: (1, 1.5, 2, 0.5),
+        h3: (0, 1.5, 2, 0.5),
+        h4: (0, 1, 0.25, 0),
+        h5: (0, 1, 0.5, 0),
+        h6: (0, 1, 0.5, 0)
+);
+
+@each $heading, $properties in $headings {
+  #{$heading} {
+    font-size: ms(nth($properties, 1));
+    @include line-height(nth($properties, 2));
+    @include margin-top(nth($properties, 3));
+    @include margin-bottom(nth($properties, 4));
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+small, figcaption {
+  font-size: ms(-1);
+}

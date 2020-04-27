@@ -1,0 +1,115 @@
+html {
+  font-family: 'geomanist', sans-serif;
+  font-size: 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
+$fonts-sizes: 64 34 24 22 18 17 16 14 12 6;
+
+.text {
+  &-{
+    @each $size in $fonts-sizes {
+      &#{$size} {
+        @include font-size(#{$size}px);
+      }
+    }
+  }
+}
+
+address {
+  .btn-secondary {
+    border-radius: 40px;
+    &:hover {
+      border-color: $white;
+      box-shadow: 0 -2px 19px rgba(102,102,102,.4);
+    }
+  }
+}
+
+.btn-secondary:hover {
+  color: $secondary;
+  background-color: #fff;
+  border-color: $secondary;
+}
+
+form {
+  label {
+    a {
+      text-decoration: underline;
+    }
+  }
+}
+
+.address-map {
+  cursor: pointer;
+  position: relative;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+  }
+  &:hover {
+    &::before {
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      transform: translate(-50%, -50%);
+      background-color: $white;
+      mask-size: cover;
+    }
+    &::after {
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      background-color: rgba($black, 0.5);
+    }
+  }
+}
+
+
+// Styles
+
+.home-card-item {
+  cursor: pointer;
+  user-select: none;
+  @include media-breakpoint-down(md){
+    min-width: 140px !important;
+    div:not(.card-body){
+      height: 160px !important;
+    }
+  }
+}
+
+.sf-toolbar-clearer {
+  clear: both;
+  height: 0px !important;
+}
+
+.modal {
+  &.show {
+    background: rgba(0,0,0,0.2);
+    user-select: none;
+    display: block;
+  }
+}

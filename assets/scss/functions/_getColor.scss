@@ -1,0 +1,29 @@
+// Dependencies
+@import "../../../../integration/scss/variables/colors";
+
+@function theme-color($color-name) {
+  @if map-has-key($theme-colors,  $color-name) {
+    @return  var(--#{$color-name}-color, map-get($theme-colors, $color-name));
+  }
+}
+
+@function text-color($color-name) {
+  @if map-has-key($theme-text-colors,  $color-name) {
+    @return  var(--#{$color-name}-color, map-get($theme-text-colors, $color-name));
+  }
+  @error "Invalid color name: `#{$color-name}`.";
+}
+
+@function default-color($color-name) {
+  @if map-has-key($default-colors,  $color-name) {
+    @return  var(--#{$color-name}-color, map-get($default-colors, $color-name));
+  }
+  @error "Invalid color name: `#{$color-name}`.";
+}
+
+@function scope-color($color-name) {
+  @if map-has-key($scope-colors,  $color-name) {
+    @return  var(--#{$color-name}-color, map-get($scope-colors, $color-name));
+  }
+  @error "Invalid color name: `#{$color-name}`.";
+}

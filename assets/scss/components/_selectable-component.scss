@@ -1,0 +1,42 @@
+
+@keyframes slidein {
+  from {
+    right: -50%;
+  }
+  to {
+    right: 0;
+  }
+}
+
+.selectable-component{
+  label {
+    $g: &;
+    input[type=checkbox],
+    input[type=radio]{
+      &:checked + div{
+        border: none !important;
+        position: relative;
+        color: $primary;
+        background-color: color('white') !important;
+        overflow: hidden;
+        &::after {
+          content: 'Taux: ' attr(data-value) 'MG';
+          font-family: 'geomanist', sans-serif;
+          font-weight: 700 !important;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          animation-duration: .3s;
+          animation-name: slidein;
+          right: 0;
+          top: 0;
+          height: 100%;
+          width: 50%;
+          color: $white;
+          background-color: $secondary;
+        }
+      }
+    }
+  }
+}

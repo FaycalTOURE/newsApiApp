@@ -1,0 +1,22 @@
+$body-color: $text;
+$btn-border-width: 2px;
+$border-radius: 20px;
+
+$link-hover-decoration: none;
+
+$font-family-base: 'geomanist', sans-serif;
+$font-family-sans-serif: 'geomanist', sans-serif;
+
+$line-height: 1.45;
+
+$font-size-base: 1rem;
+
+$padding: 15px;
+$paragraph-margin-bottom: 0;
+
+$spacer-unit: 5;
+$spacer: 5px;
+$spacer-x: $spacer;
+$spacer-y: $spacer;
+
+$spacers: (6: ($spacer * 4), 8: ($spacer * 6), 9: ($spacer * 7), 10: ($spacer * 8), 16: ($spacer * 14));

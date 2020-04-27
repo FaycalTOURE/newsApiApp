@@ -1,0 +1,7 @@
+// Dependencies
+@import "../../../../integration/scss/variables/core";
+
+@function ms($value, $ms-ratio: $ratio, $ms-base: $base){
+  $size: pow($ms-ratio, $value) * $ms-base;
+  @return #{ $size + "rem" };
+}
