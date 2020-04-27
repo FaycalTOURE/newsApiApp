@@ -1,4 +1,4 @@
-# SERVERsocket
+# News App
 
 Code de départ pour mettre en place une connexion entre un serveur NodeJS et une page web statique.
 
