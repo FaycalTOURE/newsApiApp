@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const Mandatories = require('../../services/mandatory.service');
 const { checkFields } = require('../../services/request.service');
 const Models = require('../../models/index');
-const { sendBodyError, sendFieldsError, sendApiSuccessResponse, sendApiErrorResponse } = require('../../services/response.service');
+const { sendBodyError, sendFieldsError, sendApiErrorResponse } = require('../../services/response.service');
 
 router.post('/', ( req, res, next ) => {
     console.log('=> Requête', req, '\n', '=> Response',res);
@@ -24,7 +24,7 @@ router.post('/', ( req, res, next ) => {
                 req.body.password = hashedPassword;
 
                 Models.identity.create( req.body )
-                    .then( identity => sendApiSuccessResponse(res, 'Identity created', { identity, identity }))
+                    .then( identity => res.status(200).send({ auth: true, token: identity.generateJwt(identity), identity }))
                     .catch( err => sendApiErrorResponse(res, 'Identity not created', err))
             })
             .catch( bcryptError => sendApiErrorResponse(res, 'Bcrypt error', req.body))

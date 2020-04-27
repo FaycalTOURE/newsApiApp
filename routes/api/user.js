@@ -1,21 +1,16 @@
 const express = require('express');
 const router = express.Router();
-
+const VerifyToken = require('../../services/VerifyToken');
 const Models = require('../../models/index');
-const { sendBodyError, sendFieldsError, sendApiSuccessResponse, sendApiErrorResponse } = require('../../services/response.service');
 
-router.get('/:id', async ( req, res, next ) => {
-    console.log(req.params.id);
+router.get('/', VerifyToken, async ( req, res, next ) => {
     console.log('=> Requête', req, '\n', '=> Response',res);
-    // Get user infos from user token
-    Models.favorite.find( {author: req.params['id']}, (err, favorite) => {
-        if( err ){ sendApiErrorResponse(res, 'Unknow user', err) }
-        else{
-            Models.identity.findById( req.params['id'], (err, user) => {
-                if( err ){ sendApiErrorResponse(res, 'Unknow user', err) }
-                else{ sendApiSuccessResponse(res, 'User logged', { user, favorite }) }
-            });
-        }
+
+    Models.identity.findById(req.userId, { password: 0 }, function (err, user) {
+        if (err) return res.status(500).send("There was a problem finding the user.");
+        if (!user) return res.status(404).send("No user found.");
+
+        res.status(200).send(user);
     });
 });
 

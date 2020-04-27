@@ -7,11 +7,14 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
+const cookiesService = require('./services/cookies.service');
+
 // Routes
 const user = require('./routes/api/user');
 const login = require('./routes/api/login');
 const favorite = require('./routes/api/favorite');
 const register = require('./routes/api/register');
+const logout = require('./routes/api/logout');
 const news = require('./routes/api/news');
 
 const {setAuthentication} = require('./services/auth.service');
@@ -45,12 +48,13 @@ class ServerClass {
     };
 
     routes() {
-        server.get('/', (req, res) => res.render('home', { foo : 'bar'}));
+        server.get('/', (req, res) => res.render('home', { foo : 'bar', user : cookiesService.getcookie(req, process.env.COOKIE_SECRET)}));
         server.use('/api/register', register);
         server.use('/api/login', login);
         server.use('/api/user', user);
         server.use('/api/favorite', favorite);
         server.use('/api/news', news);
+        server.use('/api/logout', logout);
     };
 
     launch() {

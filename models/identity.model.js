@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 const jwt = require('jsonwebtoken');
+const config = require('../config');
+
 
 const identitySchema = new Schema({
     email: {unique: true, type: String},
@@ -9,16 +11,13 @@ const identitySchema = new Schema({
 });
 
 identitySchema.methods.generateJwt = (user) => {
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 59);
-
     const jwtObj = {
-        _id: user._id,
-        expireIn: '10s',
-        exp: parseInt(expiry.getTime() / 100, 10)
+        id: user._id,
     };
     // JWT creation
-    return jwt.sign(jwtObj, process.env.JWT_SECRET)
+    return jwt.sign(jwtObj, config.secret, {
+        expiresIn: 86400
+    })
 };
 
 const IdentityModel = mongoose.model('identity', identitySchema);

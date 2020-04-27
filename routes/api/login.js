@@ -1,36 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
 
-const Mandatories = require('../../services/mandatory.service');
-const { checkFields } = require('../../services/request.service');
 const Models = require('../../models/index');
-const { sendBodyError, sendFieldsError, sendApiSuccessResponse, sendApiErrorResponse } = require('../../services/response.service');
 
 router.post('/', ( req, res, next ) => {
     console.log('=> Requête', req, '\n', '=> Response',res);
 
-    if (typeof req.body === 'undefined' || req.body === null) {
-        sendBodyError(res, 'No body data provided')
-    }
+    Models.identity.findOne({ email: req.body.email }, function (err, user) {
+        if (err) return res.status(500).send('Error on the server.');
+        if (!user) return res.status(404).send('No user found.');
 
-    const { miss, extra, ok } = checkFields( Mandatories.login , req.body);
-    if (!ok) { sendFieldsError(res, 'Bad fields provided', miss, extra) }
-    else{
-        Models.identity.findOne( { email: req.body.email }, )
-            .then( identity => {
-                const validPassword = bcrypt.compareSync(req.body.password, identity.password);
+        let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+        if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
 
-                if(!validPassword){
-                    sendApiErrorResponse(res, 'Bad password', null)
-                }
-                else{
-                    res.cookie(process.env.COOKIE_NAME, identity.generateJwt(identity), { httpOnly: true });
-                    sendApiSuccessResponse(res, 'User logged', { identity,  cookie: res.cookie })
-                }
-            })
-            .catch( err => sendApiErrorResponse(res, 'Identity not created', err))
-    }
+        var token = jwt.sign({ id: user._id }, config.secret, {
+            expiresIn: 86400
+        });
+
+        res.status(200).send({ auth: true, token: token });
+    });
 });
 
 module.exports = router;
