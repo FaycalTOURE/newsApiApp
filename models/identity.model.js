@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 const jwt = require('jsonwebtoken');
-const config = require('../config');
 
 
 const identitySchema = new Schema({
@@ -15,7 +14,7 @@ identitySchema.methods.generateJwt = (user) => {
         id: user._id,
     };
     // JWT creation
-    return jwt.sign(jwtObj, config.secret, {
+    return jwt.sign(jwtObj, process.env.JWT_SECRET, {
         expiresIn: 86400
     })
 };
