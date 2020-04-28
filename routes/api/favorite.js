@@ -6,20 +6,12 @@ const { checkFields } = require('../../services/request.service');
 const Models = require('../../models/index');
 const { sendBodyError, sendFieldsError, sendApiSuccessResponse, sendApiErrorResponse } = require('../../services/response.service');
 
-router.post('/', (req, res, next) => {
-    if (typeof req.body === 'undefined' || req.body === null) { sendBodyError(res, 'No body data provided') };
+const VerifyToken = require('../../services/VerifyToken');
 
-    // Check fields in the body
-    const { miss, extra, ok } = checkFields( Mandatories.favorite , req.body);
-    //=> Error: bad fields provided
-    console.log(ok, req.body);
-    if (!ok) { sendFieldsError(res, 'Bad fields provided', miss, extra) }
-    else{
-        // Create new object
-        Models.favorite.create( req.body )
-            .then( data => sendApiSuccessResponse(res, `Favorite created!`, { data }))
-            .catch( err => sendApiErrorResponse(res, `Favorite not created...`, err))
-    }
+router.post('/', VerifyToken, (req, res, next) => {
+    Models.favorite.create( req.body )
+        .then( data => sendApiSuccessResponse(res, `Favorite created!`, { data }))
+        .catch( err => sendApiErrorResponse(res, `Favorite not created...`, err))
 });
 
 router.delete('/:id', (req, res, next) => {
