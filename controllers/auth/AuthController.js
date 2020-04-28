@@ -37,17 +37,27 @@ router.post('/login', ( req, res, next ) => {
         let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
         if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
 
-        var token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        let token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: 86400
         });
+
+        let cookie = req.cookies[process.env.COOKIE_NAME];
+        if (cookie === undefined)
+        {
+            res.cookie(process.env.COOKIE_NAME, token, { maxAge: 900000, httpOnly: false });
+            console.log('cookie created successfully');
+        }else{
+            console.log('cookie exist');
+        }
 
         res.status(200).send({ auth: true, token: token });
     });
 });
 
-router.get('/logout', function(req, res) {
-    res.status(200).send({ auth: false, token: null });
-});
+// cote client detruire cookie
+// router.get('/logout', function(req, res) {
+//     res.status(200).send({ auth: false, token: null });
+// });
 
 
 router.get('/user', VerifyToken, async ( req, res, next ) => {

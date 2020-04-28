@@ -43,7 +43,7 @@ class ServerClass {
     };
 
     routes() {
-        server.get('/', (req, res) => res.render('home', { foo : 'bar', user : cookiesService.getcookie(req, process.env.COOKIE_SECRET)}));
+        server.get('/', (req, res) => res.render('home'));
         server.use('/api/favorite', favorite);
         server.use('/api/news', require('./controllers/newsController'));
         server.use('/api/auth', require('./controllers/auth/AuthController'));
