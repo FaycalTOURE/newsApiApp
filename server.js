@@ -11,7 +11,6 @@ const cookiesService = require('./services/cookies.service');
 
 // Routes
 const favorite = require('./routes/api/favorite');
-const news = require('./routes/api/news');
 
 const {setAuthentication} = require('./services/auth.service');
 const mongoDB = require('./services/db.service');
@@ -46,7 +45,7 @@ class ServerClass {
     routes() {
         server.get('/', (req, res) => res.render('home', { foo : 'bar', user : cookiesService.getcookie(req, process.env.COOKIE_SECRET)}));
         server.use('/api/favorite', favorite);
-        server.use('/api/news', news);
+        server.use('/api/news', require('./controllers/newsController'));
         server.use('/api/auth', require('./controllers/auth/AuthController'));
     };
 
