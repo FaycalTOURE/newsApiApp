@@ -37,9 +37,10 @@
 
         const searcSelectBox = searchForm.elements['requestSource'];
 
-        for (let i = 0; i<=sources.length; i++){
+        for (let i = 0; i < sources.length; i++){
             let opt = document.createElement('option');
-            opt.value, opt.innerHTML = sources[i];
+            opt.value = sources[i].toLowerCase().replace(/\s+/gi, '-').replace('/\[()]/gi', ' ');
+            opt.innerHTML = sources[i];
             searcSelectBox.appendChild(opt);
         }
 
@@ -82,11 +83,15 @@
                                 requestQuery :  formData.get('requestQuery')
                             }
                         }).then(function(data){
+                            let list = document.getElementById('articles');
+
                             if(data.error)
                                 return data;
-                            console.log(data);
+
                             if(data.status === 'ok' && data.articles.length > 0){
-                                let list = document.getElementById('articles');
+                                // init
+                                list.innerHTML = '';
+
                                 for(let i = 0; i < data.articles.length; i++){
                                     let li = document.createElement('li');
                                     let content = document.createTextNode(data.articles[i].description);
