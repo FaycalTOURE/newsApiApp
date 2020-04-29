@@ -171,7 +171,8 @@
                 }).then(function (user) {
                     if(user.error)
                         return user;
-                    console.log(user);
+                    const disconnectBtn = document.getElementById('disconnect');
+                    disconnect.innerText = user.pseudo +  ' ' + user.email;
                     return user;
                 });
             }
