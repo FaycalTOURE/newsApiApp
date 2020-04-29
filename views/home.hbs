@@ -1,9 +1,8 @@
 <h1>Welcome to news API v 1.0</h1>
 
 <div class="container">
-    <h6>Register</h6>
+    <button id="disconnect">Disconnect</button>
     {{> user/register }} <br>
-    <h6>Login</h6>
     {{> user/login }} <br>
     {{> search }}
 </div>
@@ -35,22 +34,66 @@
         const registerForm = document.forms.registerForm;
         const searchForm = document.forms.searchForm;
 
-        // let loginData = {
-        //     'login' : loginForm.elements['login'].value,
-        //     'password' : loginForm.elements['password'].value,
-        // };
-        //
-        // let registerData = {
-        //     'login' : registerForm.elements['login'].value,
-        //     'password' : registerForm.elements['password'].value,
-        //     'pseudo' : registerForm.elements['pseudo'].value
-        // };
         //
         // let searchData = {
         //     'requestLanguage' : 'fr',
         //     'requestSource' : searchForm.elements['sourceSelection'].selectedIndex,
         //     'requestQuery' : searchForm.elements['q'].value
         // };
+        // let submitBtns = document.getElementsByClassName('submit-btn');
+
+        function isLogged() {
+            return !!getCookie('user_auth_status');
+        }
+
+        if(isLogged()){
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'none';
+        }else{
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'block';
+        }
+
+        for (let i = 0; i < document.forms.length; i++){
+            document.forms[i].addEventListener('submit', function (e) {
+                e.preventDefault();
+                if(validerForm(document.forms[i])){
+                    const formData = new FormData(e.target);
+                    if(document.forms[i].name === 'loginForm'){
+                        // Connect
+                        let user = getConnexion('http://localhost:3888/api/auth/login', {
+                            email: formData.get('email'),
+                            password: formData.get('password')
+                        });
+                    }
+                    if(document.forms[i].name === 'registerForm'){
+                        console.log('register');
+                    }
+                }
+            })
+        }
+
+        function validerForm(f) {
+            let erreurText = '';
+            for(let i = 0; i < f.elements.length; i++){
+                let element = f.elements[i];
+                switch (element.type) {
+                    case 'text':
+                    case 'email':
+                    case 'password':
+                        if(element.value.replace(/\s/g, "") === ""){
+                            erreurText += element.name + '\n';
+                        }
+                        break;
+
+                }
+            }
+            if(erreurText === ''){
+                return true;
+            }else{
+                window.alert('veuillez renseigner ces champs : ' + '\n' + erreurText);
+            }
+        }
 
         function addToBucket(index=null, sources) {
             // searchForm.elements['sourceSelection'].selectedIndex
@@ -93,7 +136,6 @@
 
         function getCookie(name) {
             let pos = document.cookie.indexOf(name + '=');
-            console.log(document.cookie);
             if(pos !== -1){
                 let pos2 = document.cookie.indexOf(';', pos);
                 if(pos2){
@@ -105,13 +147,9 @@
         }
 
         function logout() {
-            // let date = new Date(Date.now());
-            // date = date.toUTCString();
             document.cookie = 'user_auth_status='+ getCookie('user_auth_status') +'; path=/; max-age=0';
         }
 
-        //logout();
-        //getCookie('user_auth_status');
 
         function customFetch(method, options) {
             let myHeaders = new Headers();
@@ -151,22 +189,11 @@
                 });
         }
 
-        let user = getConnexion('http://localhost:3888/api/auth/login', {
-            email: 'faycal.toure@gmail.com',
-            password: 'toto'
+        // Disconnect
+        const disconnectBtn = document.getElementById('disconnect');
+        disconnectBtn.addEventListener('click', function (e) {
+            logout();
+            //getCookie('user_auth_status') => undifined
         });
-
-        //getCookie('user_auth_status');
-
-        //logout();
-
-        //
-        //
-        // let timer = window.setTimeout(function () {
-        //     logout();
-        //     getCookie('user_auth_status');
-        //     window.clearTimeout(timer);
-        // }, 10000);
-
     });
 </script>
