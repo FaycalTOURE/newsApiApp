@@ -7,8 +7,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
-const cookiesService = require('./services/cookies.service');
-
 // Routes
 const favorite = require('./routes/api/favorite');
 

@@ -34,13 +34,13 @@
         const registerForm = document.forms.registerForm;
         const searchForm = document.forms.searchForm;
 
-        //
-        // let searchData = {
-        //     'requestLanguage' : 'fr',
-        //     'requestSource' : searchForm.elements['sourceSelection'].selectedIndex,
-        //     'requestQuery' : searchForm.elements['q'].value
-        // };
-        // let submitBtns = document.getElementsByClassName('submit-btn');
+        const searcSelectBox = searchForm.elements['requestSource'];
+
+        for (let i = 0; i<=sources.length; i++){
+            let opt = document.createElement('option');
+            opt.value, opt.innerHTML = sources[i];
+            searcSelectBox.appendChild(opt);
+        }
 
         function isLogged() {
             return !!getCookie('user_auth_status');
@@ -68,6 +68,20 @@
                     }
                     if(document.forms[i].name === 'registerForm'){
                         console.log('register');
+                    }
+                    if(document.forms[i].name === 'searchForm'){
+                        customFetch('POST', {
+                            uri : 'http://localhost:3888/api/news',
+                            news: {
+                                requestLanguage : 'en',
+                                requestSource : sources[searcSelectBox.selectedIndex],
+                                requestQuery :  formData.get('requestQuery')
+                            }
+                        }).then(function(data){
+                            if(data.error)
+                                return data;
+                            console.log(data);
+                        });
                     }
                 }
             })
@@ -167,6 +181,12 @@
             if(options.body){
                 myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
                 myInit.body = 'email=' + options.body.email + '&password=' + options.body.password ; // new FormData(document.getElementById('login-form'))
+                myHeaders.append('Content-Length', myInit.body.length);
+            }
+
+            if(options.news){
+                myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+                myInit.body = 'requestLanguage=' + options.news.requestLanguage + '&requestSource=' + options.news.requestSource + '&requestQuery=' + options.news.requestQuery ; // new FormData(document.getElementById('login-form'))
                 myHeaders.append('Content-Length', myInit.body.length);
             }
 
