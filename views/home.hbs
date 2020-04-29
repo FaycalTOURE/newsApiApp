@@ -34,12 +34,11 @@
         const registerForm = document.forms.registerForm;
         const searchForm = document.forms.searchForm;
         const disconnectBtn = document.getElementById('disconnect');
-
         const searcSelectBox = searchForm.elements['requestSource'];
 
         for (let i = 0; i < sources.length; i++){
             let opt = document.createElement('option');
-            opt.value = sources[i].toLowerCase().replace(/\s+/gi, '-').replace('/\[()]/gi', ' ');
+            opt.value = sources[i].toLowerCase().replace(/\s+/gi, '-').replace('/\[{()}]/gi', '').replace(/[\])}[{(]/g, '');
             opt.innerHTML = sources[i];
             searcSelectBox.appendChild(opt);
         }
@@ -56,6 +55,26 @@
             loginForm.style.display = 'block';
             registerForm.style.display = 'block';
             disconnectBtn.style.display = 'none';
+        }
+
+        function select_value(selectBox){
+            let oSelect = selectBox;
+            if(oSelect.selectedIndex !== -1 ){
+                return oSelect.value;
+            }
+        }
+
+        function save_storage(val) {
+            localStorage.setItem('selectedSource', val.source);
+            localStorage.setItem('selectedQuery', val.query);
+        }
+
+        if(localStorage.getItem('selectedSource')){
+            searcSelectBox.value = localStorage.getItem('selectedSource');
+        }
+
+        if(localStorage.getItem('selectedQuery')){
+            searchForm.elements['requestQuery'].value = localStorage.getItem('selectedQuery');
         }
 
         for (let i = 0; i < document.forms.length; i++){
@@ -79,7 +98,7 @@
                             uri : 'http://localhost:3888/api/news',
                             news: {
                                 requestLanguage : 'en',
-                                requestSource : sources[searcSelectBox.selectedIndex],
+                                requestSource : select_value(searcSelectBox),
                                 requestQuery :  formData.get('requestQuery')
                             }
                         }).then(function(data){
@@ -99,6 +118,7 @@
                                     list.appendChild(li);
                                 }
                             }
+                            save_storage({source : select_value(searcSelectBox), query : formData.get('requestQuery') });
                         });
                     }
                 }
