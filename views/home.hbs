@@ -65,6 +65,11 @@
             disconnectBtn.style.display = 'none';
         }
 
+        if(localStorage.getItem('userName')){
+            let disconnectBtn = document.getElementById('disconnect');
+            disconnectBtn.innerText = localStorage.getItem('userName');
+        }
+
         function select_value(selectBox){
             let oSelect = selectBox;
             if(oSelect.selectedIndex !== -1 ){
@@ -84,10 +89,14 @@
                     const formData = new FormData(e.target);
                     if(document.forms[i].name === 'loginForm'){
                         // Connect
-                        let user = getConnexion('http://localhost:3888/api/auth/login', {
+                        getConnexion('http://localhost:3888/api/auth/login', {
                             email: formData.get('email'),
                             password: formData.get('password')
                         });
+
+                        let disconnectBtn = document.getElementById('disconnect');
+                        localStorage.setItem('userName', formData.get('email') + ' ( ' + disconnectBtn.innerText + ')');
+
                         window.location.reload();
                     }
                     if(document.forms[i].name === 'registerForm'){
@@ -96,6 +105,8 @@
                             password: formData.get('password'),
                             pseudo: formData.get('pseudo')
                         });
+                        let disconnectBtn = document.getElementById('disconnect');
+                        localStorage.setItem('userName', formData.get('email') + ' ( ' + disconnectBtn.innerText + ')');
                     }
                     if(document.forms[i].name === 'searchForm'){
                         customFetch('POST', {
@@ -171,8 +182,6 @@
                 }).then(function (user) {
                     if(user.error)
                         return user;
-                    const disconnectBtn = document.getElementById('disconnect');
-                    disconnect.innerText = user.pseudo +  ' ' + user.email;
                     return user;
                 });
             }
@@ -227,6 +236,7 @@
 
         function logout() {
             document.cookie = 'user_auth_status='+ getCookie('user_auth_status') +'; path=/; max-age=0';
+            localStorage.removeItem('userName');
             window.location.reload();
         }
 
