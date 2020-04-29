@@ -51,6 +51,14 @@
             loginForm.style.display = 'none';
             registerForm.style.display = 'none';
             disconnectBtn.style.display = 'block';
+
+            if(localStorage.getItem('selectedSource')){
+                searcSelectBox.value = localStorage.getItem('selectedSource');
+            }
+
+            if(localStorage.getItem('selectedQuery')){
+                searchForm.elements['requestQuery'].value = localStorage.getItem('selectedQuery');
+            }
         }else{
             loginForm.style.display = 'block';
             registerForm.style.display = 'block';
@@ -69,14 +77,6 @@
             localStorage.setItem('selectedQuery', val.query);
         }
 
-        if(localStorage.getItem('selectedSource')){
-            searcSelectBox.value = localStorage.getItem('selectedSource');
-        }
-
-        if(localStorage.getItem('selectedQuery')){
-            searchForm.elements['requestQuery'].value = localStorage.getItem('selectedQuery');
-        }
-
         for (let i = 0; i < document.forms.length; i++){
             document.forms[i].addEventListener('submit', function (e) {
                 e.preventDefault();
@@ -91,7 +91,11 @@
                         window.location.reload();
                     }
                     if(document.forms[i].name === 'registerForm'){
-                        console.log('register');
+                        registerMe('http://localhost:3888/api/auth/register', {
+                            email: formData.get('email'),
+                            password: formData.get('password'),
+                            pseudo: formData.get('pseudo')
+                        });
                     }
                     if(document.forms[i].name === 'searchForm'){
                         customFetch('POST', {
@@ -118,7 +122,9 @@
                                     list.appendChild(li);
                                 }
                             }
-                            save_storage({source : select_value(searcSelectBox), query : formData.get('requestQuery') });
+                            if(isLogged()){
+                                save_storage({source : select_value(searcSelectBox), query : formData.get('requestQuery') });
+                            }
                         });
                     }
                 }
@@ -171,7 +177,7 @@
             }
         }
 
-        function getConnexion(url, data, logout = false) {
+        function getConnexion(url, data) {
             if(url){
                 customFetch('POST', {
                     uri : url,
@@ -181,6 +187,26 @@
                         return data;
                     if(data.auth){
                         getUserData('http://localhost:3888/api/auth/user', data.token);
+                    }
+                });
+            }
+        }
+
+        function registerMe(url, data) {
+            if(url){
+                customFetch('POST', {
+                    uri : url,
+                    register: data
+                }).then(function(data){
+                    console.log(data);
+                    if(data.error)
+                        return data;
+                    if(data.auth){
+                        getConnexion('http://localhost:3888/api/auth/login', {
+                            email: data.identity.email,
+                            password: registerForm.elements['password'].value
+                        });
+                        window.location.reload();
                     }
                 });
             }
@@ -223,6 +249,12 @@
                 myHeaders.append('Content-Length', myInit.body.length);
             }
 
+            if(options.register){
+                myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+                myInit.body = 'email=' + options.register.email + '&password=' + options.register.password + '&pseudo=' + options.register.pseudo; // new FormData(document.getElementById('login-form'))
+                myHeaders.append('Content-Length', myInit.body.length);
+            }
+
             if(options.news){
                 myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
                 myInit.body = 'requestLanguage=' + options.news.requestLanguage + '&requestSource=' + options.news.requestSource + '&requestQuery=' + options.news.requestQuery ; // new FormData(document.getElementById('login-form'))
@@ -251,7 +283,6 @@
         // Disconnect
         disconnectBtn.addEventListener('click', function (e) {
             logout();
-            //getCookie('user_auth_status') => undifined
         });
     });
 </script>
