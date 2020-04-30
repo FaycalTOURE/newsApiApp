@@ -1,4 +1,8 @@
-<h1>Welcome to news API v 1.0</h1>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+   <div class="container text-center">
+       <h1 class="text-white">Welcome to news API v 1.0</h1>
+   </div>
+</nav>
 
 <div class="container">
     <button id="disconnect">Disconnect</button>
@@ -127,10 +131,18 @@
                                 list.innerHTML = '';
 
                                 for(let i = 0; i < data.articles.length; i++){
-                                    let li = document.createElement('li');
-                                    let content = document.createTextNode(data.articles[i].description);
-                                    li.appendChild(content);
-                                    list.appendChild(li);
+                                    let fetched = data.articles[i];
+                                    let content = `
+                                        <div class="card" style="width: 18rem;">
+                                          <img class="card-img-top" src="${fetched.urlToImage}" alt="${fetched.title}">
+                                          <div class="card-body">
+                                            <h5 class="card-title">${fetched.title}</h5>
+                                            <p class="card-text">${fetched.description}</p>
+                                            <a href="${fetched.url}" class="btn btn-primary">Go somewhere</a>
+                                          </div>
+                                        </div>
+                                    `;
+                                    list.innerHTML += content;
                                 }
                             }
                             if(isLogged()){
