@@ -81,6 +81,7 @@
                         author : data.email,
                         token : getCookie('user_auth_status')
                     });
+                    save_storage({source : select_value(searcSelectBox), query: searchForm.elements['requestQuery'].value});
                     window.location.reload();
                 });
 
@@ -141,7 +142,9 @@
 
         function save_storage(val) {
             localStorage.setItem('selectedSource', val.source);
-            localStorage.setItem('selectedQuery', val.query);
+            if(val.query){
+                localStorage.setItem('selectedQuery', val.query);
+            }
         }
 
         for (let i = 0; i < document.forms.length; i++){
