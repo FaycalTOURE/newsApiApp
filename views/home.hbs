@@ -35,10 +35,12 @@
 
         // form
         const loginForm = document.forms.loginForm;
+        const addSourceListForm = document.forms.addSourceListForm;
         const registerForm = document.forms.registerForm;
         const searchForm = document.forms.searchForm;
         const disconnectBtn = document.getElementById('disconnect');
         const searcSelectBox = searchForm.elements['requestSource'];
+        const sourceList = document.getElementById('sourceList');
 
         for (let i = 0; i < sources.length; i++){
             let opt = document.createElement('option');
@@ -55,6 +57,7 @@
             loginForm.style.display = 'none';
             registerForm.style.display = 'none';
             disconnectBtn.style.display = 'block';
+            sourceList.style.display = 'block';
 
             if(localStorage.getItem('selectedSource')){
                 searcSelectBox.value = localStorage.getItem('selectedSource');
@@ -63,15 +66,70 @@
             if(localStorage.getItem('selectedQuery')){
                 searchForm.elements['requestQuery'].value = localStorage.getItem('selectedQuery');
             }
+
+            if(localStorage.getItem('userName')){
+                let disconnectBtn = document.getElementById('disconnect');
+                disconnectBtn.innerText = localStorage.getItem('userName');
+            }
+
+            getUserData('http://localhost:3888/api/auth/user', getCookie('user_auth_status')).then(function (data) {
+
+                addSourceListForm.addEventListener('submit', function (e) {
+                    addUserFavorite('http://localhost:3888/api/favorite', {
+                        id : data._id,
+                        title : select_value(searcSelectBox),
+                        author : data.email,
+                        token : getCookie('user_auth_status')
+                    });
+                    window.location.reload();
+                });
+
+                getUserFavorite('http://localhost:3888/api/favorite/' + data._id, {
+                    token : getCookie('user_auth_status')
+                }).then(function (data) {
+                    let list = document.getElementById('favorites');
+
+                    if(data.error)
+                        return data;
+
+                    if(data.length > 0){
+                        // init
+                        list.innerHTML = '';
+
+                        for(let i = 0; i < data.length; i++){
+                            let fetched = data[i];
+                            let content = `
+                                        <span data-id="${fetched._id}" class="badge badge-pill badge-success m-1">${fetched.title}</span>
+                                    `;
+                            list.innerHTML += content;
+                        }
+                    }
+                    return list;
+                }).then(function (list) {
+                    if(list && list.children){
+                        let favorite = list.children;
+                        for(let i = 0; i < favorite.length; i++){
+                            favorite[i].addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                customFetch('DELETE', {
+                                    uri : 'http://localhost:3888/api/favorite/' + favorite[i].getAttribute('data-id'),
+                                    deleteFavorite: true,
+                                    token: getCookie('user_auth_status')
+                                }).then(function(data){
+                                    if(data.error)
+                                        return data;
+                                    window.location.reload();
+                                });
+                            })
+                        }
+                    }
+                });
+            });
         }else{
             loginForm.style.display = 'block';
             registerForm.style.display = 'block';
             disconnectBtn.style.display = 'none';
-        }
-
-        if(localStorage.getItem('userName')){
-            let disconnectBtn = document.getElementById('disconnect');
-            disconnectBtn.innerText = localStorage.getItem('userName');
+            sourceList.style.display = 'none';
         }
 
         function select_value(selectBox){
@@ -133,14 +191,16 @@
                                 for(let i = 0; i < data.articles.length; i++){
                                     let fetched = data.articles[i];
                                     let content = `
-                                        <div class="card" style="width: 18rem;">
-                                          <img class="card-img-top" src="${fetched.urlToImage}" alt="${fetched.title}">
-                                          <div class="card-body">
-                                            <h5 class="card-title">${fetched.title}</h5>
-                                            <p class="card-text">${fetched.description}</p>
-                                            <a href="${fetched.url}" class="btn btn-primary">Go somewhere</a>
-                                          </div>
-                                        </div>
+                                        <li class="card-item ${i % 3 === 0 ? 'ml-0' : 'ml-5'}">
+                                          <div class="card my-5" style="width: 18rem;">
+                                              <img class="card-img-top" src="${fetched.urlToImage}" alt="${fetched.title}">
+                                              <div class="card-body">
+                                                <h5 class="card-title">${fetched.title}</h5>
+                                                <p class="card-text">${fetched.description}</p>
+                                                <a href="${fetched.url}" class="btn btn-primary">Go somewhere</a>
+                                              </div>
+                                            </div>
+                                        </li>
                                     `;
                                     list.innerHTML += content;
                                 }
@@ -176,19 +236,35 @@
             }
         }
 
-        function addToBucket(index=null, sources) {
-            // searchForm.elements['sourceSelection'].selectedIndex
-            if(index){
-                if(sources.indexOf(index) !== -1){
-                    let indexToAdd = index;
-                    //...
-                }
+
+        function addUserFavorite(uri, data) {
+            if(sources.indexOf(sources[searcSelectBox.selectedIndex]) !== -1){
+                customFetch('POST', {
+                    uri,
+                    favorite : data
+                }).then(function (favorite) {
+                    if(favorite.error)
+                        return favorite;
+                    console.log(favorite);
+                    return favorite;
+                });
             }
+        }
+
+        function getUserFavorite(uri, data) {
+            return customFetch('GET', {
+                uri,
+                favorites: data
+            }).then(function (favorites) {
+                if(favorites.error)
+                    return favorites;
+                return favorites;
+            });
         }
 
         function getUserData(uri, token) {
             if(token && uri){
-                customFetch('GET', {
+                return customFetch('GET', {
                     token,
                     uri
                 }).then(function (user) {
@@ -198,6 +274,7 @@
                 });
             }
         }
+
 
         function getConnexion(url, data) {
             if(url){
@@ -262,7 +339,7 @@
                 cache: 'default'
             };
 
-            if(options.token){
+            if(options.token || options.deleteFavorite){
                 myHeaders.set('x-access-token', options.token);
             }
 
@@ -274,14 +351,26 @@
 
             if(options.register){
                 myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
-                myInit.body = 'email=' + options.register.email + '&password=' + options.register.password + '&pseudo=' + options.register.pseudo; // new FormData(document.getElementById('login-form'))
+                myInit.body = 'email=' + options.register.email + '&password=' + options.register.password + '&pseudo=' + options.register.pseudo;
                 myHeaders.append('Content-Length', myInit.body.length);
             }
 
             if(options.news){
                 myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
-                myInit.body = 'requestLanguage=' + options.news.requestLanguage + '&requestSource=' + options.news.requestSource + '&requestQuery=' + options.news.requestQuery ; // new FormData(document.getElementById('login-form'))
+                myInit.body = 'requestLanguage=' + options.news.requestLanguage + '&requestSource=' + options.news.requestSource + '&requestQuery=' + options.news.requestQuery ;
                 myHeaders.append('Content-Length', myInit.body.length);
+            }
+
+            if(options.favorite){
+                myHeaders.set('x-access-token', options.favorite.token);
+                myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+                myInit.body = 'author=' + options.favorite.author + '&id=' + options.favorite.id + '&title=' + options.favorite.title ;
+                myHeaders.append('Content-Length', myInit.body.length);
+            }
+
+            if(options.favorites){
+                console.log('oui');
+                myHeaders.set('x-access-token', options.favorites.token);
             }
 
             myInit.headers = myHeaders;

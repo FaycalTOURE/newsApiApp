@@ -14,8 +14,15 @@ router.post('/', VerifyToken, (req, res, next) => {
         .catch( err => sendApiErrorResponse(res, `Favorite not created...`, err))
 });
 
-router.delete('/:id', (req, res, next) => {
-    // Delete  object
+router.get('/:id', VerifyToken, (req, res, next) => {
+    Models.favorite.find({id : req.userId}, function (err, user) {
+        if (err) return res.status(500).send("There was a problem finding the user favorite.");
+        if (!user) return res.status(404).send("No user favorite found.");
+        res.status(200).send(user);
+    });
+});
+
+router.delete('/:id', VerifyToken, (req, res, next) => {
     Models.favorite.deleteOne( { _id: req.params['id'] } )
         .then( data => sendApiSuccessResponse(res, `Favorite deleted!`, { data }))
         .catch( err => sendApiErrorResponse(res, `Favorite not deleted...`, err))

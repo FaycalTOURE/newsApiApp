@@ -8,7 +8,13 @@
         <label for="searchFormRequestSource">Source</label>
         <select class="form-control" name="requestSource" id="searchFormRequestSource"></select>
     </div>
-    <button type="submit" onclick="this.disable = true;" class="btn btn-primary submit-btn">Search</button>
+    <button type="submit" onclick="this.disable = true;" class="btn btn-primary submit-btn">Search</button><br>
 </form>
 
-<ul id="articles" class="row my-5"></ul>
+<form name="addSourceListForm">
+    <button type="submit" id="sourceList" class="btn btn-light">(+) source</button><br>
+</form>
+
+<ul id="favorites" class="row my-5 p-3"></ul>
+
+<ul id="articles" class="row my-5 p-3"></ul>
